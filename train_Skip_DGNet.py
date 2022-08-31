@@ -1,7 +1,7 @@
 # File : train.py
 import torchvision
 from torch.utils.tensorboard import SummaryWriter
-from baseline_dynamic2 import *
+from baseline_dynamic import *
 #from model import *
 from torch.utils.data import DataLoader
 
