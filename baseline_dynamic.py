@@ -32,7 +32,7 @@ class FeedforwardGateI(nn.Module):
         self.relu1 = nn.ReLU(inplace=True)
 
         # adding another conv layer
-        self.conv2 = nn.Conv2d(channel, channel, kernel_size=3, stride=2, padding=1, bias=False)
+        self.conv2 = nn.Conv2d(channel, channel, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(channel)
         self.relu2 = nn.ReLU(inplace=True)
 
