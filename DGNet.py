@@ -229,6 +229,7 @@ class DGModel(nn.Module):
         self.fc1 = nn.Linear(363, 64)
         self.drop = nn.Dropout(0.5)
         self.fc2 = nn.Linear(64, 10)
+        #self.prob = nn.Softmax(dim=1)
     def forward(self, x):
         #return self.decoder(self.encoder(x))
         en_features = self.features(x).squeeze()
@@ -241,4 +242,6 @@ class DGModel(nn.Module):
         #print('The output of dropout layer : {}'.format(x2.shape))
         x3 = self.fc2(x2)
         #print('The output of Second FC layer : {}'.format(x3.shape))
+        #x4 = self.prob(x3)
+        #print('The output of softmax layer: {}'.format(x4))
         return x3
