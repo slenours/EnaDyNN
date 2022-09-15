@@ -1,22 +1,21 @@
 
 """
-	Dense-Gated Model
+	Dynamic model with layer skipping
 """
 from imports import nn, torch, cp, F, math, OrderedDict
 
-
+# This is a bottleneck structure
 def _bn_function_factory(norm, relu, conv):
     def bn_function(*inputs):
+
         concated_features = torch.cat(inputs, 1)
-        if concated_features.size(0) != 1:
-            concated_features = norm(concated_features)
+        concated_features = norm(concated_features)
         bottleneck_output = conv(relu(concated_features))  # BN-RELU-CONV 1x1
         return bottleneck_output
-
     return bn_function
 
 
-# Feedforward-Gate (FFGate-I): this is the gating function definition
+# Feedforward-Gate (FFGate-I)
 class FeedforwardGateI(nn.Module):
     """ Use Max Pooling First and then apply to multiple 2 conv layers.
     The first conv has stride = 1 and second has stride = 2"""
@@ -32,7 +31,7 @@ class FeedforwardGateI(nn.Module):
         self.relu1 = nn.ReLU(inplace=True)
 
         # adding another conv layer
-        self.conv2 = nn.Conv2d(channel, channel, kernel_size=3, stride=1, padding=1, bias=False)
+        self.conv2 = nn.Conv2d(channel, channel, kernel_size=3, stride=1, padding=1, bias=False)  # Need to change the stride here from 1 to 2
         self.bn2 = nn.BatchNorm2d(channel)
         self.relu2 = nn.ReLU(inplace=True)
 
@@ -81,6 +80,7 @@ class FeedforwardGateI(nn.Module):
 
         gate_features = (features, softmax)
         return gate_features
+
 
 class _ChannelSELayer(nn.Module):
     """
@@ -179,11 +179,6 @@ class _Transition(nn.Module):
 
 
 class _DenseBlock(nn.Module):
-    """
-    We adjust the dynamism in this part. In cpntrast to the Skip_Net based on ResNet, we make the output directly to 0 if the layer is skipped.
-
-    """
-
     def __init__(self, num_layers, num_input_features, bn_size, growth_rate, drop_rate, pool_size, skip_size, efficient=False):
         super(_DenseBlock, self).__init__()
         self.num_layers = num_layers
@@ -200,7 +195,7 @@ class _DenseBlock(nn.Module):
             gate_layer = FeedforwardGateI(pool_size=pool_size, channel=num_input_features + i * growth_rate)
             # self.add_module('denselayer%d' % (i + 1), layer)
             setattr(self, 'denselayer{}'.format(i + 1), layer)
-            setattr(self, 'gatelayer{}'.format(i + 1), gate_layer)  #add gate layer
+            setattr(self, 'gatelayer{}'.format(i + 1), gate_layer)
 
     def forward(self, init_features):
         #print('The size of init_features is : {}'.format(init_features.shape))
@@ -213,11 +208,12 @@ class _DenseBlock(nn.Module):
             #gprob = gate_features[1]
             #print('mask output: {}'.format(mask))
             #print('gate_probabilty output: {}'.format(gprob))
+
             if mask.size(0) == 1:
                 mask = mask.view(1)
                 if mask == 1:
                     new_features = getattr(self, 'denselayer{}'.format(i + 1))(*features)
-                    #print('No skipping')
+                    #rint('No skipping')
                 else:
                     new_features = torch.zeros([1, 12, int(self.skip_size), int(self.skip_size)], dtype=torch.float)
                     #print('skipping is normal')
@@ -249,9 +245,17 @@ class _DenseBlock(nn.Module):
 
 
 class Skip_DGNet(nn.Module):
-    r"""
-    Skip_DGNet is dynamic model with dynamism layer skipping. We add a gating function, which determine whether layers
-    are skipped.
+    r"""Densenet-BC model class, based on
+    `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`
+    Args:
+        growth_rate (int) - how many filters to add each layer (`k` in paper)
+        block_config (list of 3 or 4 ints) - how many layers in each pooling block
+        num_init_features (int) - the number of filters to learn in the first convolution layer
+        bn_size (int) - multiplicative factor for number of bottle neck layers
+            (i.e. bn_size * k features in the bottleneck layer)
+        drop_rate (float) - dropout rate after each dense layer
+        small_inputs (bool) - set to True if images are 32x32. Otherwise assumes images are larger.
+        efficient (bool) - set to True to use checkpointing. Much more memory efficient, but slower.
     """
 
     def __init__(self, growth_rate=12, block_config=(16, 16, 16, 16), compression=0.5,
@@ -261,8 +265,18 @@ class Skip_DGNet(nn.Module):
         assert 0 < compression <= 1, 'compression of densenet should be between 0 and 1'
         # First convolution
         if small_inputs:
+            """
+            self.features = nn.Sequential(OrderedDict([
+                ('conv0', nn.Conv2d(3, num_init_features, kernel_size=3, stride=1, padding=1, bias=False)),
+            ]))
+            """
             self.add_module('conv0', nn.Conv2d(3, num_init_features, kernel_size=3, stride=1, padding=1, bias=False))
         else:
+            """
+            self.features = nn.Sequential(OrderedDict([
+                ('conv0', nn.Conv2d(3, num_init_features, kernel_size=7, stride=2, padding=3, bias=False)),
+            ]))
+            """
             self.add_module('conv0', nn.Conv2d(3, num_init_features, kernel_size=7, stride=2, padding=3, bias=False))
             self.add_module('norm0', nn.BatchNorm2d(num_init_features))
             self.add_module('relu0', nn.ReLU(inplace=True))
@@ -271,7 +285,7 @@ class Skip_DGNet(nn.Module):
         # Each denseblock
         num_features = num_init_features
         pool_size = 16
-        skip_size = 8
+        skip_size = 8 # Set the size of skipped features
         self.features = nn.Sequential(OrderedDict([]))
         for i, num_layers in enumerate(block_config):
             block = _DenseBlock(
