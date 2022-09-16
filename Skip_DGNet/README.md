@@ -1,5 +1,7 @@
 # Skip_DGNet
 
+The imports.py includes packages you need to train the model.
+
 The DGNet.py contains the baseline model for image classification task.
 
 The Skip_DGNet.py includes the dynamic model Skip_DGNet. We adjust the baseline model with a gating function to implement layer-skipping. The gating function is a feed-forward gate from the paper “SkipNet: Learning Dynamic Routing in Convolutional Networks” .
