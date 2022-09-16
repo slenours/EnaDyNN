@@ -10,4 +10,4 @@ To explore the effect of dynamic mechanism on the baseline model, I propose Bran
 ## Python Dependencies
 * chainer-7.8.1
 * dill
-* 
+* cupy-cuda111-8.1.0
