@@ -14,7 +14,7 @@ The prediction.py is the prediction file for the dynamic model Skip_DGNet. You c
 
 The image0 to image9 the images for the prediction process. You can download them for the purpose of perdiction or you can pick your own images if you want.
 
-The Skip_DGNet_Noactivation_coomment_code.py includes the dynamic model Skip_DGNet having no activations of gating functions through commenting out certain part of code. The Skip_DGNet_Noactivation_execute_all_layers.py includes the dynamic model Skip_DGNet having no activations of gating functions through executing all layers. We use these two special models, DGNet model and Skip_DGNet to make a small experiment to support the results shown in the report DyNN.
+The Skip_DGNet_Noactivation_coomment_code.py includes the dynamic model Skip_DGNet having no activations of gating functions through commenting out certain part of code. The Skip_DGNet_Noactivation_execute_all_layers.py includes the dynamic model Skip_DGNet having no activations of gating functions through executing all layers. We use these two special models, DGNet model and Skip_DGNet model to make a small experiment to support the results shown in the report DyNN.
 
 The experiment_DGNet.py is the experiment training file for training DGNet for 20 epochs.
 
