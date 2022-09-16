@@ -22,3 +22,7 @@ To explore the effect of dynamic mechanism on the baseline model, I propose Bran
 ```python
 !python3 branchy_dgnet_cifar10.py
 ```
+
+## Results
+<img width="520" alt="image" src="https://github.com/slenours/EnaDyNN/blob/main/BranchyDenseNet/img/Selective%20results.png">
+
