@@ -1,5 +1,5 @@
 """
-Using cifar-10 on BranchyDenseNet带分支网络模型上进行测试
+Using cifar-10 on BranchyDenseNet
 """
 
 from branchynet import utils, visualize
@@ -19,7 +19,7 @@ TEST_BATCHSIZE = 64
 TRAIN_NUM_EPOCHES = 100
 #SAVE_PATH = 'branchy_dgnet_cifar10/'  # save pics
 MODEL_NAME = 'branchy_dgnet_cifar10(' + str(100) + ').bn'  # model name
-#MODEL_NAME = 'branchy_dgnet_cifar10(' + str(TRAIN_NUM_EPOCHES) + ').bn'  # 保存模型名称
+#MODEL_NAME = 'branchy_dgnet_cifar10(' + str(TRAIN_NUM_EPOCHES) + ').bn'  
 CSV_NAME = 'branchy_dgnet(' + str(TRAIN_NUM_EPOCHES) + ')'  # csv name
 
 # import cifar10
