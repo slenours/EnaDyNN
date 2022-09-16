@@ -11,3 +11,8 @@ To explore the effect of dynamic mechanism on the baseline model, I propose Bran
 * chainer-7.8.1
 * dill
 * cupy-cuda111-8.1.0
+
+## Experiment
+```python
+!python3 branchy_dgnet_cifar10.py
+```
