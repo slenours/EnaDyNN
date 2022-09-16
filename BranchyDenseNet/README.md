@@ -15,6 +15,10 @@ To explore the effect of dynamic mechanism on the baseline model, I propose Bran
 ## Experiment
 ```python
 !pip install chainer
+```
+```python
 !pip install 'cupy-cuda111==8.1.0'
+```
+```python
 !python3 branchy_dgnet_cifar10.py
 ```
